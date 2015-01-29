@@ -52,10 +52,13 @@ L.MuseumTileLayer = L.TileLayer.extend({
   },
 
   onAdd: function (map) {
+    var self = this
     this.adjustAttribution()
 
     L.TileLayer.prototype.onAdd.call(this, map);
     this.fitImage()
+
+    map.on('resize', self._mapResized.bind(self))
   },
 
   _getImageBounds: function () {
@@ -90,7 +93,7 @@ L.MuseumTileLayer = L.TileLayer.extend({
   // zoomed portion of the image. These two zooms are stored in `this.options.zooms`
   fitBoundsExactly: function() {
     var i, c
-      , imageSize = i = this._imageSize.reverse()[0]
+      , imageSize = i = this._imageSize[this._imageSize.length-1]
       , containerSize = c =  map.getSize()
 
     var iAR, cAR
@@ -120,6 +123,12 @@ L.MuseumTileLayer = L.TileLayer.extend({
       this._map.options.attributionControl = false
       this._map.attributionControl.remove()
     }
+  },
+
+  _mapResized: function() {
+    var self = this
+    clearTimeout(self._throttleResize)
+    self._throttleResize = setTimeout(L.bind(self.fitBoundsExactly, self), 100)
   },
 })
 
