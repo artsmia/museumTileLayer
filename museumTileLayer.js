@@ -3,13 +3,15 @@ L.MuseumTileLayer = L.TileLayer.extend({
     crs: L.CRS.Simple,
     infinite: false,
     noWrap: true,
-    attributionControl: false
+    attributionControl: false,
+    detectRetina: true
   },
 
   initialize: function(url, options) {
     this.options.crs.wrapLat = this.options.crs.wrapLng =  null
     L.TileLayer.prototype.initialize.call(this, url, options)
 
+    this._adjustForRetina = this.options.detectRetina && L.Browser.retina
     this._computeImageAndGridSize()
     this.on('tileload', this._adjustNonSquareTile)
   },
@@ -18,6 +20,8 @@ L.MuseumTileLayer = L.TileLayer.extend({
     var options = this.options,
       imageSize = L.point(options.width, options.height),
       tileSize = options.tileSize || 256
+
+    if(this._adjustForRetina) tileSize = tileSize*2 // Don't build the grid off half-sized retina tiles
 
     this._imageSize = [imageSize];
     this._gridSize = [this._getGridSize(imageSize)];
@@ -31,7 +35,8 @@ L.MuseumTileLayer = L.TileLayer.extend({
     this._imageSize.reverse();
     this._gridSize.reverse();
 
-    this.options.maxZoom = this.options.maxNativeZoom = this._gridSize.length - 1;
+    this.options.maxNativeZoom = this._gridSize.length - 1
+    this.options.maxZoom = this.options.maxNativeZoom - this.options.zoomOffset;
   },
 
   _getGridSize: function (imageSize) {
@@ -41,13 +46,17 @@ L.MuseumTileLayer = L.TileLayer.extend({
 
   _adjustNonSquareTile: function (data) {
     var tile = data.tile
-    tile.style.width = tile.naturalWidth + 'px'
-    tile.style.height = tile.naturalHeight + 'px'
+      , tileSize = L.point(tile.naturalWidth, tile.naturalHeight)
+
+    if(this._adjustForRetina) tileSize = tileSize.divideBy(2)
+
+    tile.style.width = tileSize.x + 'px'
+    tile.style.height = tileSize.y + 'px'
   },
 
   _isValidTile: function(coords) {
     return (coords.x == 0 && coords.y == 0 && coords.z == 0) ||
-      coords.x >= 0 && coords.y >= 0 && coords.z > 0 &&
+      coords.x >= 0 && coords.y >= 0 && coords.z > 0 && coords.z &&
       L.TileLayer.prototype._isValidTile.call(this, coords)
   },
 
@@ -64,9 +73,12 @@ L.MuseumTileLayer = L.TileLayer.extend({
   _getImageBounds: function () {
     var map = this._map
       , options = this.options
-      , nw = map.unproject([0, 0], map.getMaxZoom())
-      , se = map.unproject([options.width, options.height], map.getMaxZoom())
+      , imageSize = L.point(options.width, options.height)
+      , zoom = map.getMaxZoom()+this.options.zoomOffset
+      , nw = map.unproject([0, 0], zoom)
 
+    var se = map.unproject(imageSize, zoom)
+    
     return L.latLngBounds(nw, se)
   },
 
@@ -104,7 +116,7 @@ L.MuseumTileLayer = L.TileLayer.extend({
           {fit: c.y/i.y, fill: c.x/i.x} :
           {fit: c.x/i.x, fill: c.y/i.y}
 
-    var zoom = this.options.minZoom = map.getScaleZoom(zooms.fit, map.getMaxZoom())
+    var zoom = this.options.minZoom = map.getScaleZoom(zooms.fit, map.getMaxZoom()+this.options.zoomOffset)
     this._map._addZoomLimit(this)
   },
 
