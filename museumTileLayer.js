@@ -1,3 +1,5 @@
+if(typeof require !== "undefined") var L = require('leaflet')
+
 L.MuseumTileLayer = L.TileLayer.extend({
   options: {
     crs: L.CRS.Simple,
@@ -147,3 +149,7 @@ L.MuseumTileLayer = L.TileLayer.extend({
 L.museumTileLayer = function (url, options) {
   return new L.MuseumTileLayer(url, options);
 };
+
+if(typeof module !== "undefined" && typeof require !== "undefined") {
+  module.exports = L
+}

@@ -1,0 +1,28 @@
+{
+  "name": "museum-tile-layer",
+  "version": "0.0.1",
+  "description": "Leaflet layer optimized for images of art",
+  "main": "museumTileLayer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kjell/museumTileLayer.git"
+  },
+  "keywords": [
+    "leaflet",
+    "art",
+    "image",
+    "zoom"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kjell/museumTileLayer/issues"
+  },
+  "homepage": "https://github.com/kjell/museumTileLayer#readme",
+  "dependencies": {
+    "leaflet": "^1.0.0-beta.1"
+  }
+}
