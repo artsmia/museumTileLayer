@@ -66,6 +66,7 @@ L.MuseumTileLayer = L.TileLayer.extend({
   onAdd: function (map) {
     var self = this
     this.adjustAttribution()
+    map.options.maxBoundsViscosity = 0.8
 
     L.TileLayer.prototype.onAdd.call(this, map);
     this.fitImage()
