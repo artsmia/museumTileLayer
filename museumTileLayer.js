@@ -48,12 +48,13 @@ L.MuseumTileLayer = L.TileLayer.extend({
 
   _adjustNonSquareTile: function (data) {
     var tile = data.tile
+      , pad = 1
       , tileSize = L.point(tile.naturalWidth, tile.naturalHeight)
 
     if(this._adjustForRetina) tileSize = tileSize.divideBy(2)
 
-    tile.style.width = tileSize.x + 'px'
-    tile.style.height = tileSize.y + 'px'
+    tile.style.width = tileSize.x + pad + 'px'
+    tile.style.height = tileSize.y + pad + 'px'
   },
 
   _isValidTile: function(coords) {
