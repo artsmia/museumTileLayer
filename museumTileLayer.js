@@ -6,7 +6,8 @@ L.MuseumTileLayer = L.TileLayer.extend({
     infinite: false,
     noWrap: true,
     attributionControl: false,
-    detectRetina: true
+    detectRetina: true,
+    edgeBufferTiles: 1,
   },
 
   initialize: function(url, options) {
@@ -154,6 +155,21 @@ L.MuseumTileLayer = L.TileLayer.extend({
 L.museumTileLayer = function (url, options) {
   return new L.MuseumTileLayer(url, options);
 };
+
+// https://github.com/TolonUK/Leaflet.EdgeBuffer
+var unbufferedGetTiledPixelBounds = L.GridLayer.prototype._getTiledPixelBounds
+L.GridLayer.include({
+  _getTiledPixelBounds: function(center, zoom, tileZoom) {
+    var pixelBounds = unbufferedGetTiledPixelBounds.call(this, center, zoom, tileZoom)
+
+    if (this.options.edgeBufferTiles > 0) {
+      var pixelEdgeBuffer = this.options.edgeBufferTiles * this._tileSize.x
+      pixelBounds = new L.Bounds(pixelBounds.min.subtract([pixelEdgeBuffer, pixelEdgeBuffer]), pixelBounds.max.add([pixelEdgeBuffer, pixelEdgeBuffer]))
+    }
+
+    return pixelBounds;
+  }
+})
 
 if(typeof module !== "undefined" && typeof require !== "undefined") {
   module.exports = L
