@@ -110,6 +110,7 @@ L.MuseumTileLayer = L.TileLayer.extend({
   fitBoundsExactly: function() {
     var i, c
       , imageSize = i = this._imageSize[this._imageSize.length-1]
+      , map = this._map
       , containerSize = c =  map.getSize()
 
     var iAR, cAR
@@ -121,7 +122,9 @@ L.MuseumTileLayer = L.TileLayer.extend({
           {fit: c.x/i.x, fill: c.y/i.y}
 
     var zoom = this.options.minZoom = map.getScaleZoom(zooms.fit, map.getMaxZoom()+this.options.zoomOffset)
-    this._map._addZoomLimit(this)
+    map._addZoomLimit(this)
+    var fill = map.getScaleZoom(zooms.fill, map.getMaxZoom())
+    if(map.getZoom() < fill) map.setZoom(zoom)
   },
 
   fillContainer: function() {
