@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MIA Leaflet debug page</title>
+  <title>Mia Leaflet debug page</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-beta.1/leaflet.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script type="text/javascript" src="https://tdx.s3.amazonaws.com/leaflet-src.js"></script>
@@ -24,14 +24,14 @@
       crs: L.CRS.Simple,
     }).setView([0, 0], 0);
 
-    var wave = L.museumTileLayer('http://{s}.tiles.dx.artsmia.org/{id}/{z}/{x}/{y}.png', {
+    var rice = L.museumTileLayer('http://{s}.tiles.dx.artsmia.org/{id}/{z}/{x}/{y}.png', {
       id: 'rice-cultivation-wide',
       width: 40800,
       height: 20018,
-      attribution: "<a href='https://collections.artsmia.org/index.php?page=detail&id=22412'>Rice Farming in the Four Seasons, Kanō Sanraku.</a>"
+      attribution: "<a href='http://artsmia.org/art/22412'>Rice Farming in the Four Seasons, Kanō Sanraku.</a>"
     })
 
-    wave.addTo(map)
+    rice.addTo(map)
   </script>
 </body>
 </html>
