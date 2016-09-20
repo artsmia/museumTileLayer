@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script type="text/javascript" src="https://tdx.s3.amazonaws.com/leaflet-src.js"></script>
   <script src="./museumTileLayer.js"></script>
+  <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+  <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
 
   <style>
     #map {
@@ -22,6 +24,7 @@
   <script type="text/javascript">
     var map = L.map('map', {
       crs: L.CRS.Simple,
+      fullscreenControl: true,
     }).setView([0, 0], 0);
 
     var rice = L.museumTileLayer('http://{s}.tiles.dx.artsmia.org/{id}/{z}/{x}/{y}.png', {
