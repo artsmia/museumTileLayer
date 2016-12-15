@@ -22,6 +22,14 @@
   <div id="map"></div>
 
   <script type="text/javascript">
+    function xhr(url, f) {
+      var x = new XMLHttpRequest
+      x.open('get', url)
+      x.send()
+      x.onreadystatechange = function() { if(x.readyState == 4) f(null, JSON.parse(x.response)) }
+      x.onerror = function() { f(x) }
+    }
+
     var map = L.map('map', {
       crs: L.CRS.Simple,
       fullscreenControl: true,
@@ -34,7 +42,42 @@
       attribution: "<a href='http://artsmia.org/art/22412'>Rice Farming in the Four Seasons, Kanō Sanraku.</a>"
     })
 
-    rice.addTo(map)
+    var id = window.location.hash.replace('#', '')
+    if(id) {
+      var tileJsonUrl = 'http://tiles.dx.artsmia.org/'+id+'.json'
+      var apiUrl = 'http://search.artsmia.org/id/'+id
+      var detailPage = 'http://collections.artsmia.org/art/'+id
+
+      xhr(apiUrl, function(err, meta) {
+        if(meta && meta.image == 'invalid') return invalid(meta)
+        if(meta && meta.restricted == 1) return invalid(meta)
+
+        xhr(tileJsonUrl, function(err, tileJson) {
+          if(err) return invalid(meta, err)
+          var image = L.museumTileLayer('http://{s}.tiles.dx.artsmia.org/{id}/{z}/{x}/{y}.png', {
+            id: id,
+            width: tileJson.width,
+            height: tileJson.height,
+            attribution: meta && '<a href="'+detailPage+'">'+meta.title+'</a>' || false
+          })
+
+          image.addTo(map)
+        })
+      })
+
+      function invalid(meta, err) {
+        var h1 = document.createElement('h1')
+        var pre = document.createElement('pre')
+        h1.innerText = 'Sorry, invalid zoomable image.'
+        pre.innerHTML = JSON.stringify(meta, undefined, 2)
+        document.body.appendChild(h1)
+        document.body.appendChild(pre)
+        document.querySelector('#map').remove()
+        document.body.style.margin = '1em'
+      }
+    } else {
+      rice.addTo(map)
+    }
   </script>
 </body>
 </html>
