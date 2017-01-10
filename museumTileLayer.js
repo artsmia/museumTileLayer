@@ -122,7 +122,8 @@ L.MuseumTileLayer = L.TileLayer.extend({
           {fit: c.y/i.y, fill: c.x/i.x} :
           {fit: c.x/i.x, fill: c.y/i.y}
 
-    var zoom = this.options.minZoom = map.getScaleZoom(zooms.fit, map.getMaxZoom()+this.options.zoomOffset)
+    var zoom = map.getScaleZoom(zooms.fit, map.getMaxZoom()+this.options.zoomOffset)
+    this.options.minZoom = Math.min(map.getMaxZoom(), zoom)
     map._addZoomLimit(this)
     var fill = map.getScaleZoom(zooms.fill, map.getMaxZoom())
     if(map.getZoom() < fill) map.setZoom(zoom)
