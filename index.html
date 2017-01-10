@@ -85,10 +85,12 @@
     // load geojson if it's provided via `#data=`
     var dataRegex = /data=data:application\/json,(.*)/
     var data = params.find(val => val.match(dataRegex))
-    var geojson = data && JSON.parse(decodeURIComponent(data.match(dataRegex)[1]))
+    var geojson = data && L.geoJson(JSON.parse(decodeURIComponent(data.match(dataRegex)[1])), {
+      onEachFeature: handleText
+    })
 
     // set up drawing
-    var drawnItems = geojson ? L.geoJson(geojson) : new L.FeatureGroup()
+    var drawnItems = geojson ? geojson : new L.FeatureGroup()
     map.addLayer(drawnItems)
     var drawControl = new L.Control.Draw({
       draw: {
@@ -100,6 +102,19 @@
         featureGroup: drawnItems,
       }
     })
+
+    map.addControl(drawControl)
+    map.on('draw:created', function (e) {
+      var type = e.layerType
+      var layer = e.layer
+      drawnItems.addLayer(layer)
+      layer.feature = layer.toGeoJSON()
+      handleText(layer.feature, layer)
+      save(e)
+    })
+    map.on('draw:edited', save)
+    map.on('draw:deleted', save)
+
     function save(e) {
       var newData = `data=data:application\/json,${encodeURIComponent(JSON.stringify(drawnItems.toGeoJSON()))}`
       var newHash = window.location.hash.match(dataRegex) ?
@@ -107,15 +122,16 @@
         window.location.hash + '#' + newData
       window.location.hash = newHash
     }
-    map.addControl(drawControl)
-    map.on('draw:created', function (e) {
-      var type = e.layerType
-      var layer = e.layer
-      drawnItems.addLayer(layer)
-      save(e)
-    })
-    map.on('draw:edited', save)
-    map.on('draw:deleted', save)
+    function handleText(feature, layer) {
+      if(feature.properties.text) { layer.bindPopup(feature.properties.text) }
+      // listen for a click and ask for some text
+      layer.on('dblclick', e => {
+        console.info(e)
+        feature.properties.text = prompt('enter text', feature.properties.text)
+        layer.bindPopup(feature.properties.text)
+        save()
+      })
+    }
   </script>
 </body>
 </html>
